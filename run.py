@@ -59,9 +59,16 @@ code_metrics['category'] = code_metrics.apply(classify_project, axis=1)
 
 st.dataframe(code_metrics)
 
+# Create a filter for user to select a value from collection_name
+selected_collection = st.selectbox("Select Collection Name", code_metrics['collection_name'].unique())
+
+# Filter the DataFrame based on the selected collection
+filtered_code_metrics = code_metrics[code_metrics['collection_name'] == selected_collection]
+
+
 # Plot the 2x2 matrix using Plotly
 fig = px.scatter(
-    code_metrics,
+    filtered_code_metrics,
     x='star_count',
     y='commit_count_6_months',
     color='category',
