@@ -57,19 +57,13 @@ def classify_project(row):
 # Apply the classification function to each row
 code_metrics['category'] = code_metrics.apply(classify_project, axis=1)
 
-# Define thresholds for popularity and activity
-star_threshold = 500  # Based on previous analysis (adjust as needed)
-commit_threshold = 300  # Based on previous analysis (adjust as needed)
-
-# Create a new column for popularity and activity levels for visualization
-code_metrics['popularity'] = code_metrics['star_count'].apply(lambda x: 'High' if x > star_threshold else 'Low')
-code_metrics['activity'] = code_metrics['commit_count_6_months'].apply(lambda x: 'High' if x > commit_threshold else 'Low')
+st.dataframe(code_metrics)
 
 # Plot the 2x2 matrix using Plotly
 fig = px.scatter(
     code_metrics,
-    x='popularity',
-    y='activity',
+    x='star_count',
+    y='commit_count_6_months',
     color='category',
     title='2x2 Matrix of Open Source Project Categories',
     labels={'popularity': 'Popularity', 'activity': 'Activity Level'},
