@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px  # Import Plotly Express
-from datetime import datetime 
+from datetime import datetime, timezone 
 
 # Read the CSV file into a DataFrame
 code_metrics = pd.read_csv('data/code_metrics.csv')
@@ -13,8 +13,9 @@ code_metrics['last_commit_date'] = pd.to_datetime(code_metrics['last_commit_date
 # Define the classification function
 def classify_project(row):
     # Calculate project age and recent activity status
-    project_age = (datetime.now() - row['first_commit_date']).days if pd.notnull(row['first_commit_date']) else None
-    recent_activity = (datetime.now() - row['last_commit_date']).days if pd.notnull(row['last_commit_date']) else None
+    now = datetime.now(timezone.utc)  # Make now timezone-aware
+    project_age = (now - row['first_commit_date']).days if pd.notnull(row['first_commit_date']) else None
+    recent_activity = (now - row['last_commit_date']).days if pd.notnull(row['last_commit_date']) else None
     
     # Category definitions
     if (row['star_count'] > 1000 and row['fork_count'] > 200 and 
