@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
-import plotly.express as px  # Import Plotly Express
-from datetime import datetime, timezone 
+import plotly.express as px
+from datetime import datetime, timezone
 
 # Read the CSV file into a DataFrame
 code_metrics = pd.read_csv('data/code_metrics.csv')
@@ -10,54 +10,44 @@ code_metrics = pd.read_csv('data/code_metrics.csv')
 code_metrics['first_commit_date'] = pd.to_datetime(code_metrics['first_commit_date'], errors='coerce')
 code_metrics['last_commit_date'] = pd.to_datetime(code_metrics['last_commit_date'], errors='coerce')
 
-# Define the classification function
-def classify_project(row):
-    # Calculate project age and recent activity status
-    now = datetime.now(timezone.utc)  # Make now timezone-aware
-    project_age = (now - row['first_commit_date']).days if pd.notnull(row['first_commit_date']) else None
+# Function to calculate thresholds dynamically based on user-selected collection
+def calculate_thresholds(df):
+    thresholds = {
+        'star_count': df['star_count'].median(),
+        'fork_count': df['fork_count'].median(),
+        'commit_count_6_months': df['commit_count_6_months'].median(),
+        'developer_count': df['developer_count'].median(),
+        'contributor_count': df['contributor_count'].median(),
+    }
+    return thresholds
+
+# Define the classification function based on calculated thresholds
+def classify_project(row, thresholds):
+    # Calculate recent activity in days
+    now = datetime.now(timezone.utc)
     recent_activity = (now - row['last_commit_date']).days if pd.notnull(row['last_commit_date']) else None
     
-    # Category definitions
-    if (row['star_count'] > 1000 and row['fork_count'] > 200 and 
-        row['developer_count'] > 14 and row['contributor_count'] > 80 and 
-        row['commit_count_6_months'] > 300 and recent_activity is not None and recent_activity <= 180):
-        return 'High Popularity, Actively Maintained'
-    
-    elif (row['star_count'] > 1000 and row['fork_count'] > 200 and 
-          6 <= row['developer_count'] <= 14 and 16 <= row['contributor_count'] <= 80 and 
-          row['commit_count_6_months'] < 60 and project_age is not None and project_age > 730 and 
-          recent_activity is not None and recent_activity > 180):
-        return 'High Popularity, Low Maintenance'
-    
-    elif (60 <= row['star_count'] <= 1000 and 28 <= row['fork_count'] <= 200 and 
-          row['developer_count'] > 6 and row['contributor_count'] > 16 and 
-          row['commit_count_6_months'] > 300 and recent_activity is not None and recent_activity <= 180):
-        return 'Niche, Actively Maintained'
-    
-    elif (6 <= row['star_count'] <= 60 and 3 <= row['fork_count'] <= 28 and 
-          2 <= row['developer_count'] <= 6 and 4 <= row['contributor_count'] <= 16 and 
-          row['commit_count_6_months'] > 60 and project_age is not None and project_age <= 730 and 
-          recent_activity is not None and recent_activity <= 180):
-        return 'New and Growing'
-    
-    elif (row['star_count'] > 1000 and row['fork_count'] > 200 and 
-          row['developer_count'] < 6 and row['contributor_count'] < 16 and 
-          row['commit_count_6_months'] < 60 and project_age is not None and project_age > 730 and 
-          recent_activity is not None and recent_activity > 180):
-        return 'Mature, Low Activity'
-    
-    elif (row['star_count'] < 6 and row['fork_count'] < 3 and 
-          row['developer_count'] < 2 and row['contributor_count'] < 4 and 
-          row['commit_count_6_months'] < 2 and recent_activity is not None and recent_activity > 365):
-        return 'Inactive or Abandoned'
-    
-    else:
-        return 'Uncategorized'
+    # Determine parameter levels based on thresholds
+    popularity = 'High' if row['star_count'] > thresholds['star_count'] or row['fork_count'] > thresholds['fork_count'] else 'Low'
+    activity = 'High' if row['commit_count_6_months'] > thresholds['commit_count_6_months'] or (recent_activity is not None and recent_activity <= 180) else 'Low'
+    size = 'Large' if row['developer_count'] > thresholds['developer_count'] or row['contributor_count'] > thresholds['contributor_count'] else 'Small'
 
-# Apply the classification function to each row
-code_metrics['category'] = code_metrics.apply(classify_project, axis=1)
+    # Assign categories based on the parameter levels
+    if popularity == 'High' and activity == 'High' and size == 'Large':
+        return 'High Popularity, High Activity, Large Size'
+    elif popularity == 'High' and activity == 'High' and size == 'Small':
+        return 'High Popularity, High Activity, Small Size'
+    elif popularity == 'High' and activity == 'Low' and size == 'Large':
+        return 'High Popularity, Low Activity, Large Size'
+    elif popularity == 'High' and activity == 'Low' and size == 'Small':
+        return 'High Popularity, Low Activity, Small Size'
+    elif popularity == 'Low' and activity == 'High' and size == 'Large':
+        return 'Low Popularity, High Activity, Large Size'
+    elif popularity == 'Low' and activity == 'High' and size == 'Small':
+        return 'Low Popularity, High Activity, Small Size'
 
-st.dataframe(code_metrics)
+# Streamlit interface for collection selection
+st.title("Open Source Project Categorization")
 
 # Create a filter for user to select a value from collection_name
 selected_collection = st.selectbox("Select Collection Name", code_metrics['collection_name'].unique())
@@ -65,6 +55,14 @@ selected_collection = st.selectbox("Select Collection Name", code_metrics['colle
 # Filter the DataFrame based on the selected collection
 filtered_code_metrics = code_metrics[code_metrics['collection_name'] == selected_collection]
 
+# Calculate thresholds based on filtered data
+thresholds = calculate_thresholds(filtered_code_metrics)
+
+# Apply the classification function with dynamic thresholds
+filtered_code_metrics['category'] = filtered_code_metrics.apply(lambda row: classify_project(row, thresholds), axis=1)
+
+# Display the categorized data
+st.dataframe(filtered_code_metrics)
 
 # Plot the 2x2 matrix using Plotly
 fig = px.scatter(
@@ -73,17 +71,16 @@ fig = px.scatter(
     y='commit_count_6_months',
     color='category',
     title='2x2 Matrix of Open Source Project Categories',
-    labels={'popularity': 'Popularity', 'activity': 'Activity Level'},
+    labels={'star_count': 'Star Count (Popularity)', 'commit_count_6_months': 'Commit Count (Activity)'},
     color_discrete_map={
-        'High Popularity, Actively Maintained': 'blue',
-        'High Popularity, Low Maintenance': 'orange',
-        'Niche, Actively Maintained': 'green',
-        'New and Growing': 'purple',
-        'Mature, Low Activity': 'red',
-        'Inactive or Abandoned': 'gray',
-        'Uncategorized': 'brown'
+        'High Popularity, High Activity, Large Size': 'blue',
+        'High Popularity, High Activity, Small Size': 'orange',
+        'High Popularity, Low Activity, Large Size': 'green',
+        'High Popularity, Low Activity, Small Size': 'purple',
+        'Low Popularity, High Activity, Large Size': 'red',
+        'Low Popularity, High Activity, Small Size': 'gray',
     }
 )
 
 # Display the plot in Streamlit
-st.plotly_chart(fig)  # Use Streamlit to display the Plotly figure
+st.plotly_chart(fig)
