@@ -145,16 +145,16 @@ if selected_collection:
             title='2x2 Matrix of Open Source Project Categories',
             labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
             color_discrete_map={
-                'High Popularity, Actively Maintained': '#87CEEB',  # Light Sky Blue
-                'High Popularity, Low Maintenance': '#FFDAB9',      # Soft Peach
-                'Niche, Actively Maintained': '#E6E6FA',            # Lavender
-                'New and Growing': '#98FF98',                       # Mint Green
-                'Moderately Maintained': '#B2DFDB',                 # Light Seafoam
-                'Mature, Low Activity': '#FFF5BA',                  # Light Sand
-                'Moderate Popularity, Low Activity': '#FFCCCB',     # Pale Rose
-                'Low Popularity, Low Activity': '#D3D3D3',          # Light Gray
-                'Inactive or Abandoned': '#F5F5DC',                 # Very Light Beige
-                'Uncategorized': '#B0C4DE'                          # Light Slate Gray
+                'High Popularity, Actively Maintained': '#4682B4',  # Sky Blue
+                'High Popularity, Low Maintenance': '#FFB07C',      # Peach
+                'Niche, Actively Maintained': '#9370DB',            # Lavender Purple
+                'New and Growing': '#3CB371',                       # Mint
+                'Moderately Maintained': '#66CDAA',                 # Seafoam Green
+                'Mature, Low Activity': '#D2B48C',                  # Sand
+                'Moderate Popularity, Low Activity': '#FF6F61',     # Rose
+                'Low Popularity, Low Activity': '#A9A9A9',          # Gray
+                'Inactive or Abandoned': '#CDC5B4',                 # Beige
+                'Uncategorized': '#778899'                          # Slate Gray
             },
             text='display_name'
         )
