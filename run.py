@@ -115,9 +115,36 @@ if selected_collection:
     # Increase font size for the first level (category)
     fig_treemap.update_traces(textfont=dict(size=18))  # Adjust size as desired
 
+    # Count projects by category
+    category_counts = filtered_code_metrics['category'].value_counts().reindex(desired_order, fillna=0)
+
+    # Create bar chart
+    fig_bar = px.bar(
+        x=category_counts.values,
+        y=category_counts.index,
+        orientation='h',
+        labels={'x': 'Number of Projects', 'y': 'Category'},
+        color=category_counts.index,
+        color_discrete_map={
+            'High Popularity, Actively Maintained': '#87CEEB',
+            'High Popularity, Low Maintenance': '#FFDAB9',
+            'Niche, Actively Maintained': '#E6E6FA',
+            'New and Growing': '#98FF98',
+            'Moderately Maintained': '#B2DFDB',
+            'Mature, Low Activity': '#FFF5BA',
+            'Moderate Popularity, Low Activity': '#FFCCCB',
+            'Low Popularity, Low Activity': '#D3D3D3',
+            'Inactive or Abandoned': '#F5F5DC',
+            'Uncategorized': '#B0C4DE'
+        },
+        title="Number of Projects by Category"
+    )
+    fig_bar.update_layout(showlegend=False)
+    
     # Centering the treemap using Streamlit columns
     col1, col2, col3 = st.columns([1, 3, 1])  # The middle column is wider to center the chart
     with col2:
+        st.plotly_chart(fig_bar)
         st.plotly_chart(fig_treemap)
     
     # Step 3: Show the Category selection only after Collection is selected
