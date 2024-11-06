@@ -114,9 +114,13 @@ if selected_collection:
 
     # Increase font size for the first level (category)
     fig_treemap.update_traces(textfont=dict(size=18))  # Adjust size as desired
-
-    # Count projects by category
+    
+    # Count projects by category and reorder based on desired_order
     category_counts = filtered_code_metrics['category'].value_counts().reindex(desired_order, fill_value=0)
+    
+    # Filter out categories with zero counts
+    category_counts = category_counts[category_counts > 0]
+
 
     # Create bar chart
     fig_bar = px.bar(
