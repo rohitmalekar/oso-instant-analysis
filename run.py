@@ -117,9 +117,10 @@ fig = px.scatter(
         'Moderately Maintained': 'cyan',
         'Uncategorized': 'black'
     },
-    text='display_name',  # Add project display name as text labels
-    textposition='top center'
+    text='display_name'
 )
+
+fig.update_traces(textposition='top center')  # Position text above the dots
 
 # Update layout for size and log scale
 fig.update_layout(
