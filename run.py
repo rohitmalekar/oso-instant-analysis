@@ -137,7 +137,7 @@ if selected_collection:
     selected_categories = st.multiselect(
         "Select Categories",
         options=category_options,
-        default=["All"],  # Start with "All" selected, or set to [] for no pre-selection
+        default=[],  # Start with "All" selected, or set to [] for no pre-selection
         format_func=lambda x: "All Categories" if x == "All" else x
     )
     
