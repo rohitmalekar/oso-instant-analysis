@@ -133,10 +133,7 @@ if selected_collection:
     if selected_category and selected_category != "":
         if selected_category != "All":
             filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
-    
-        # Display the categorized data
-        st.dataframe(filtered_code_metrics)
-    
+            
         # Calculate the new Y-axis value for the plot
         filtered_code_metrics['commit_per_active_dev'] = (
             filtered_code_metrics['commit_count_6_months'] / 
@@ -173,3 +170,24 @@ if selected_collection:
     
         # Display the plot
         st.plotly_chart(fig)
+
+
+        # Define the desired column order
+        column_order = [
+            'display_name', 
+            'star_count', 
+            'fork_count', 
+            'first_commit_date', 
+            'last_commit_date', 
+            'developer_count', 
+            'contributor_count', 
+            'active_developer_count_6_months', 
+            'commit_count_6_months', 
+            'merged_pull_request_count_6_months', 
+            'closed_issue_count_6_months'
+        ]
+        
+        # Display the DataFrame in the specified column order
+        st.dataframe(filtered_code_metrics[column_order])
+
+ 
