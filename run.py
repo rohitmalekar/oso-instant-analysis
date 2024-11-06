@@ -105,7 +105,12 @@ if selected_collection:
         },
         title=f"Project Distribution by Category in '{selected_collection}'"
     )
-    
+
+    fig_treemap.update_layout(
+        width=800,  # Set width to make the chart square
+        height=800,  # Set height to match width
+        margin=dict(t=40, l=0, r=0, b=0)
+    )
     # Display the treemap chart
     st.plotly_chart(fig_treemap)
     
