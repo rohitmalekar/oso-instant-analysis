@@ -142,7 +142,7 @@ if selected_collection:
     )
     
     # Filter the DataFrame only if a valid category is selected
-    if selected_category and selected_category != "":
+    if selected_categories and selected_categories != "":
         #if selected_category != "All":
         #    filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
 
