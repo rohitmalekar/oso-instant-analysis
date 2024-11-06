@@ -107,7 +107,6 @@ if selected_collection:
         title=f"Project Distribution by Category in '{selected_collection}'"
     )
     
-    fig_sunburst.update_traces(maxdepth=1)
     
     # Step 3: Update layout for readability
     fig_sunburst.update_layout(
