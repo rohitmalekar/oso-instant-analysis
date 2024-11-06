@@ -172,8 +172,19 @@ if selected_collection:
         st.plotly_chart(fig)
 
 
-        # Define the desired column order
+        # Convert the 'category' column to a categorical type with the desired order
+        filtered_code_metrics['category'] = pd.Categorical(
+            filtered_code_metrics['category'], 
+            categories=desired_order, 
+            ordered=True
+        )
+        
+        # Sort the DataFrame by the 'category' column
+        filtered_code_metrics = filtered_code_metrics.sort_values('category')
+        
+        # Define the column order
         column_order = [
+            'category',
             'display_name', 
             'star_count', 
             'fork_count', 
