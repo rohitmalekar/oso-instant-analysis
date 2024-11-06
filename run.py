@@ -95,7 +95,7 @@ if selected_collection:
     # Use a selectbox instead of radio buttons to allow an unselected initial state
     selected_category = st.selectbox(
         "Select Category",
-        options=[""] + ["All"] + + ordered_categories,  # Add an empty string as the first option, followed by "All" and the categories
+        options=[""] + ["All"] + ordered_categories,  # Add an empty string as the first option, followed by "All" and the categories
         format_func=lambda x: "Please select a category" if x == "" else x
     )
     
