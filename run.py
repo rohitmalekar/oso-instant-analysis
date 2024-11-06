@@ -145,6 +145,8 @@ if selected_collection:
     )
     fig_bar.update_layout(showlegend=False)
     
+    st.markdown("## Collection Insights: Project Categories and Developer Engagement")
+    
     # Centering the treemap using Streamlit columns
     col1, col2, col3 = st.columns([1, 3, 1])  # The middle column is wider to center the chart
     with col2:
@@ -170,6 +172,9 @@ if selected_collection:
     #    format_func=lambda x: "Please select a category" if x == "" else x
     #)
 
+
+    st.markdown("## Category Deep Dive")
+    
     # Define available categories with an "All" option
     category_options = ["All"] + ordered_categories
     
