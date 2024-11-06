@@ -12,6 +12,20 @@ code_metrics = pd.read_csv('data/code_metrics.csv')
 code_metrics['first_commit_date'] = pd.to_datetime(code_metrics['first_commit_date'], errors='coerce')
 code_metrics['last_commit_date'] = pd.to_datetime(code_metrics['last_commit_date'], errors='coerce')
 
+# Define the desired category order
+desired_order = [
+    'High Popularity, Actively Maintained',
+    'High Popularity, Low Maintenance',
+    'Niche, Actively Maintained',
+    'New and Growing',
+    'Moderately Maintained',
+    'Mature, Low Activity',
+    'Moderate Popularity, Low Activity',
+    'Low Popularity, Low Activity',
+    'Inactive or Abandoned',
+    'Uncategorized'
+]
+
 # Define the classification function with specified criteria
 def classify_project(row):
     now = datetime.now(timezone.utc)
@@ -63,10 +77,9 @@ st.title("Open Source Observer - Instant Analytics")
 # Step 1: Create a filter for the user to select a Collection Name
 selected_collection = st.selectbox(
     "Select Collection Name",
-    options=[""] + code_metrics['collection_name'].unique().tolist(),
+    options=[""] + sorted(code_metrics['collection_name'].unique().tolist()),  # Sort the collection names alphabetically
     format_func=lambda x: "Select a Collection" if x == "" else x
 )
-
 
 # Step 2: Filter based on the selected collection and apply classification
 if selected_collection:
@@ -75,10 +88,14 @@ if selected_collection:
     
     # Step 3: Show the Category selection only after Collection is selected
     categories = filtered_code_metrics['category'].unique().tolist()
+
+    # Filter the categories list based on the ones that exist in the data, keeping the specified order
+    ordered_categories = [cat for cat in desired_order if cat in categories]
+    
     # Use a selectbox instead of radio buttons to allow an unselected initial state
     selected_category = st.selectbox(
         "Select Category",
-        options=[""] + ["All"] + categories,  # Add an empty string as the first option, followed by "All" and the categories
+        options=[""] + ["All"] + + ordered_categories,  # Add an empty string as the first option, followed by "All" and the categories
         format_func=lambda x: "Please select a category" if x == "" else x
     )
     
