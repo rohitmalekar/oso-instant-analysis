@@ -111,6 +111,10 @@ if selected_collection:
         height=800,  # Set height to match width
         margin=dict(t=40, l=0, r=0, b=0)
     )
+
+    # Increase font size for the first level (category)
+    fig_treemap.update_traces(textfont=dict(size=18))  # Adjust size as desired
+
     # Centering the treemap using Streamlit columns
     col1, col2, col3 = st.columns([1, 3, 1])  # The middle column is wider to center the chart
     with col2:
