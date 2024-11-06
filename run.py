@@ -92,16 +92,16 @@ if selected_collection:
         values='developer_count',
         color='category',
         color_discrete_map={
-            'High Popularity, Actively Maintained': 'blue',
-            'High Popularity, Low Maintenance': 'orange',
-            'Niche, Actively Maintained': 'green',
-            'New and Growing': 'purple',
-            'Moderately Maintained': 'cyan',
-            'Mature, Low Activity': 'red',
-            'Moderate Popularity, Low Activity': 'pink',
-            'Low Popularity, Low Activity': 'brown',
-            'Inactive or Abandoned': 'gray',
-            'Uncategorized': 'black'
+        'High Popularity, Actively Maintained': '#87CEEB',  # Light Sky Blue
+        'High Popularity, Low Maintenance': '#FFDAB9',      # Soft Peach
+        'Niche, Actively Maintained': '#E6E6FA',            # Lavender
+        'New and Growing': '#98FF98',                       # Mint Green
+        'Moderately Maintained': '#B2DFDB',                 # Light Seafoam
+        'Mature, Low Activity': '#FFF5BA',                  # Light Sand
+        'Moderate Popularity, Low Activity': '#FFCCCB',     # Pale Rose
+        'Low Popularity, Low Activity': '#D3D3D3',          # Light Gray
+        'Inactive or Abandoned': '#F5F5DC',                 # Very Light Beige
+        'Uncategorized': '#B0C4DE'                          # Light Slate Gray
         },
         title=f"Project Distribution by Category in '{selected_collection}'"
     )
@@ -145,16 +145,16 @@ if selected_collection:
             title='2x2 Matrix of Open Source Project Categories',
             labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
             color_discrete_map={
-                'High Popularity, Actively Maintained': 'blue',
-                'High Popularity, Low Maintenance': 'orange',
-                'Niche, Actively Maintained': 'green',
-                'New and Growing': 'purple',
-                'Mature, Low Activity': 'red',
-                'Inactive or Abandoned': 'gray',
-                'Low Popularity, Low Activity': 'brown',
-                'Moderate Popularity, Low Activity': 'pink',
-                'Moderately Maintained': 'cyan',
-                'Uncategorized': 'black'
+                'High Popularity, Actively Maintained': '#87CEEB',  # Light Sky Blue
+                'High Popularity, Low Maintenance': '#FFDAB9',      # Soft Peach
+                'Niche, Actively Maintained': '#E6E6FA',            # Lavender
+                'New and Growing': '#98FF98',                       # Mint Green
+                'Moderately Maintained': '#B2DFDB',                 # Light Seafoam
+                'Mature, Low Activity': '#FFF5BA',                  # Light Sand
+                'Moderate Popularity, Low Activity': '#FFCCCB',     # Pale Rose
+                'Low Popularity, Low Activity': '#D3D3D3',          # Light Gray
+                'Inactive or Abandoned': '#F5F5DC',                 # Very Light Beige
+                'Uncategorized': '#B0C4DE'                          # Light Slate Gray
             },
             text='display_name'
         )
