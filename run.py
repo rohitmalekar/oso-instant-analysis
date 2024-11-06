@@ -85,6 +85,35 @@ selected_collection = st.selectbox(
 if selected_collection:
     filtered_code_metrics = code_metrics[code_metrics['collection_name'] == selected_collection]
     filtered_code_metrics['category'] = filtered_code_metrics.apply(classify_project, axis=1)
+
+    # Step 2: Prepare data for the sunburst chart with only Category > Project hierarchy
+    fig_sunburst = px.sunburst(
+        filtered_code_metrics,
+        path=['category', 'display_name'],  # Only two levels: Category > Project
+        values='developer_count',  # Use developer_count to size each project segment
+        color='category',  # Color by category
+        color_discrete_map={
+            'High Popularity, Actively Maintained': 'blue',
+            'High Popularity, Low Maintenance': 'orange',
+            'Niche, Actively Maintained': 'green',
+            'New and Growing': 'purple',
+            'Moderately Maintained': 'cyan',
+            'Mature, Low Activity': 'red',
+            'Moderate Popularity, Low Activity': 'pink',
+            'Low Popularity, Low Activity': 'brown',
+            'Inactive or Abandoned': 'gray',
+            'Uncategorized': 'black'
+        },
+        title=f"Project Distribution by Category in '{selected_collection}'"
+    )
+
+    # Step 3: Update layout for readability
+    fig_sunburst.update_layout(
+        margin=dict(t=40, l=0, r=0, b=0)
+    )
+
+    # Step 4: Display the sunburst chart in Streamlit
+    st.plotly_chart(fig_sunburst)
     
     # Step 3: Show the Category selection only after Collection is selected
     categories = filtered_code_metrics['category'].unique().tolist()
