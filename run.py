@@ -181,6 +181,10 @@ if selected_collection:
         
         # Sort the DataFrame by the 'category' column
         filtered_code_metrics = filtered_code_metrics.sort_values('category')
+        # Format the dates to 'dd-MON-YYYY'
+        filtered_code_metrics['first_commit_date'] = filtered_code_metrics['first_commit_date'].dt.strftime('%d-%b-%Y')
+        filtered_code_metrics['last_commit_date'] = filtered_code_metrics['last_commit_date'].dt.strftime('%d-%b-%Y')
+
         
         # Define the column order
         column_order = [
