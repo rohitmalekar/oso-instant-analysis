@@ -121,18 +121,39 @@ if selected_collection:
 
     # Filter the categories list based on the ones that exist in the data, keeping the specified order
     ordered_categories = [cat for cat in desired_order if cat in categories]
+
     
     # Use a selectbox instead of radio buttons to allow an unselected initial state
-    selected_category = st.selectbox(
-        "Select Category",
-        options=[""] + ["All"] + ordered_categories,  # Add an empty string as the first option, followed by "All" and the categories
-        format_func=lambda x: "Please select a category" if x == "" else x
+    #selected_category = st.selectbox(
+    #    "Select Category",
+    #    options=[""] + ["All"] + ordered_categories,  # Add an empty string as the first option, followed by "All" and the categories
+    #    format_func=lambda x: "Please select a category" if x == "" else x
+    #)
+
+    # Define available categories with an "All" option
+    category_options = ["All"] + ordered_categories
+    
+    # Use st.multiselect for multi-selection
+    selected_categories = st.multiselect(
+        "Select Categories",
+        options=category_options,
+        default=["All"],  # Start with "All" selected, or set to [] for no pre-selection
+        format_func=lambda x: "All Categories" if x == "All" else x
     )
     
     # Filter the DataFrame only if a valid category is selected
     if selected_category and selected_category != "":
-        if selected_category != "All":
-            filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
+        #if selected_category != "All":
+        #    filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
+
+        # Handle the "All" selection by including all categories if "All" is selected
+        if "All" in selected_categories:
+            filtered_categories = ordered_categories  # Use all categories if "All" is selected
+        else:
+            filtered_categories = selected_categories  # Otherwise, use the selected categories
+        
+        # Filter the DataFrame based on the selected categories
+        filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'].isin(filtered_categories)]
             
         # Calculate the new Y-axis value for the plot
         filtered_code_metrics['commit_per_active_dev'] = (
