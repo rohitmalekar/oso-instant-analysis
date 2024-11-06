@@ -75,48 +75,55 @@ if selected_collection:
     
     # Step 3: Show the Category selection only after Collection is selected
     categories = filtered_code_metrics['category'].unique().tolist()
-    selected_category = st.radio("Select Category", options=['All'] + categories)  # Using radio button as suggested
-
-    # Step 4: Further filter based on selected category
-    if selected_category != 'All':
-        filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
-
-    # Display the categorized data
-    st.dataframe(filtered_code_metrics)
-
-    # Calculate the new Y-axis value for the plot
-    filtered_code_metrics['commit_per_active_dev'] = (
-        filtered_code_metrics['commit_count_6_months'] / 
-        filtered_code_metrics['active_developer_count_6_months']
-    ).fillna(0)  # Fill NaN values with 0 if any
-
-    # Step 5: Plot the 2x2 matrix using Plotly
-    fig = px.scatter(
-        filtered_code_metrics,
-        x='star_count',
-        y='commit_per_active_dev',  # Use the new column for Y-axis
-        color='category',
-        title='2x2 Matrix of Open Source Project Categories',
-        labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
-        color_discrete_map={
-            'High Popularity, Actively Maintained': 'blue',
-            'High Popularity, Low Maintenance': 'orange',
-            'Niche, Actively Maintained': 'green',
-            'New and Growing': 'purple',
-            'Mature, Low Activity': 'red',
-            'Inactive or Abandoned': 'gray',
-            'Low Popularity, Low Activity': 'brown',
-            'Moderate Popularity, Low Activity': 'pink',
-            'Moderately Maintained': 'cyan',
-            'Uncategorized': 'black'
-        },
-        text='display_name'
+    # Use a selectbox instead of radio buttons to allow an unselected initial state
+    selected_category = st.selectbox(
+        "Select Category",
+        options=[""] + categories,  # Add an empty string as the first option
+        format_func=lambda x: "Please select a category" if x == "" else x
     )
-
-    fig.update_traces(textposition='top center')
-    fig.update_layout(width=1200, height=900, legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5))
-    fig.update_xaxes(type="log")
-    fig.update_yaxes(type="log")
-
-    # Display the plot
-    st.plotly_chart(fig)
+    
+    # Further filter based on the selected category
+    if selected_category:
+        # Only filter if a valid category is selected (i.e., not the empty string)
+        if selected_category != "All":
+            filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
+            
+            # Display the categorized data
+        st.dataframe(filtered_code_metrics)
+    
+        # Calculate the new Y-axis value for the plot
+        filtered_code_metrics['commit_per_active_dev'] = (
+            filtered_code_metrics['commit_count_6_months'] / 
+            filtered_code_metrics['active_developer_count_6_months']
+        ).fillna(0)  # Fill NaN values with 0 if any
+    
+        # Step 5: Plot the 2x2 matrix using Plotly
+        fig = px.scatter(
+            filtered_code_metrics,
+            x='star_count',
+            y='commit_per_active_dev',  # Use the new column for Y-axis
+            color='category',
+            title='2x2 Matrix of Open Source Project Categories',
+            labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
+            color_discrete_map={
+                'High Popularity, Actively Maintained': 'blue',
+                'High Popularity, Low Maintenance': 'orange',
+                'Niche, Actively Maintained': 'green',
+                'New and Growing': 'purple',
+                'Mature, Low Activity': 'red',
+                'Inactive or Abandoned': 'gray',
+                'Low Popularity, Low Activity': 'brown',
+                'Moderate Popularity, Low Activity': 'pink',
+                'Moderately Maintained': 'cyan',
+                'Uncategorized': 'black'
+            },
+            text='display_name'
+        )
+    
+        fig.update_traces(textposition='top center')
+        fig.update_layout(width=1200, height=900, legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5))
+        fig.update_xaxes(type="log")
+        fig.update_yaxes(type="log")
+    
+        # Display the plot
+        st.plotly_chart(fig)
