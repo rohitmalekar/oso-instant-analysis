@@ -111,8 +111,10 @@ if selected_collection:
         height=800,  # Set height to match width
         margin=dict(t=40, l=0, r=0, b=0)
     )
-    # Display the treemap chart
-    st.plotly_chart(fig_treemap)
+    # Centering the treemap using Streamlit columns
+    col1, col2, col3 = st.columns([1, 3, 1])  # The middle column is wider to center the chart
+    with col2:
+        st.plotly_chart(fig_treemap)
     
     # Step 3: Show the Category selection only after Collection is selected
     categories = filtered_code_metrics['category'].unique().tolist()
