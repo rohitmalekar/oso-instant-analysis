@@ -3,6 +3,8 @@ import streamlit as st
 import plotly.express as px
 from datetime import datetime, timezone
 
+st.set_page_config(page_title="OSO Instant Analysis", layout="wide")
+
 # Read the CSV file into a DataFrame
 code_metrics = pd.read_csv('data/code_metrics.csv')
 
@@ -125,7 +127,7 @@ fig.update_layout(
 
 # Set axes to logarithmic scale
 fig.update_xaxes(type="log")  # Set x-axis to log scale
-#fig.update_yaxes(type="log")  # Set y-axis to log scale
+fig.update_yaxes(type="log")  # Set y-axis to log scale
 
 # Display the plot in Streamlit
 st.plotly_chart(fig)
