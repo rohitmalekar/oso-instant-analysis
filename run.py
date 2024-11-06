@@ -116,7 +116,7 @@ if selected_collection:
     fig_treemap.update_traces(textfont=dict(size=18))  # Adjust size as desired
 
     # Count projects by category
-    category_counts = filtered_code_metrics['category'].value_counts().reindex(desired_order, fillna=0)
+    category_counts = filtered_code_metrics['category'].value_counts().reindex(desired_order, fill_value=0)
 
     # Create bar chart
     fig_bar = px.bar(
