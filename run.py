@@ -271,6 +271,7 @@ if selected_collection:
 
         st.info("The data table provides a detailed, sortable view of each project, showing key attributes like popularity (stars and forks), activity (commit and pull request counts), and developer engagement (contributor and active developer counts). Use this table to dive deeper into individual project metrics, compare across categories, and gain insights into each project’s maintenance status and community involvement.")
         # Display the DataFrame in the specified column order
+        st.caption("Search, sort, download data using options on the top-right hand corner of the table")
         st.dataframe(filtered_code_metrics[column_order],hide_index=True)
 
  
