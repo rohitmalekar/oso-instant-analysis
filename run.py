@@ -78,17 +78,16 @@ if selected_collection:
     # Use a selectbox instead of radio buttons to allow an unselected initial state
     selected_category = st.selectbox(
         "Select Category",
-        options=[""] + categories,  # Add an empty string as the first option
+        options=[""] + ["All"] + categories,  # Add an empty string as the first option, followed by "All" and the categories
         format_func=lambda x: "Please select a category" if x == "" else x
     )
     
-    # Further filter based on the selected category
-    if selected_category:
-        # Only filter if a valid category is selected (i.e., not the empty string)
+    # Filter the DataFrame only if a valid category is selected
+    if selected_category and selected_category != "":
         if selected_category != "All":
             filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
-            
-            # Display the categorized data
+    
+        # Display the categorized data
         st.dataframe(filtered_code_metrics)
     
         # Calculate the new Y-axis value for the plot
