@@ -10,41 +10,62 @@ code_metrics = pd.read_csv('data/code_metrics.csv')
 code_metrics['first_commit_date'] = pd.to_datetime(code_metrics['first_commit_date'], errors='coerce')
 code_metrics['last_commit_date'] = pd.to_datetime(code_metrics['last_commit_date'], errors='coerce')
 
-# Function to calculate thresholds dynamically based on user-selected collection
-def calculate_thresholds(df):
-    thresholds = {
-        'star_count': df['star_count'].median(),
-        'fork_count': df['fork_count'].median(),
-        'commit_count_6_months': df['commit_count_6_months'].median(),
-        'developer_count': df['developer_count'].median(),
-        'contributor_count': df['contributor_count'].median(),
-    }
-    return thresholds
-
-# Define the classification function based on calculated thresholds
-def classify_project(row, thresholds):
-    # Calculate recent activity in days
+# Define the classification function with specified criteria
+def classify_project(row):
+    # Calculate project age and recent activity status
     now = datetime.now(timezone.utc)
+    project_age = (now - row['first_commit_date']).days if pd.notnull(row['first_commit_date']) else None
     recent_activity = (now - row['last_commit_date']).days if pd.notnull(row['last_commit_date']) else None
-    
-    # Determine parameter levels based on thresholds
-    popularity = 'High' if row['star_count'] > thresholds['star_count'] or row['fork_count'] > thresholds['fork_count'] else 'Low'
-    activity = 'High' if row['commit_count_6_months'] > thresholds['commit_count_6_months'] or (recent_activity is not None and recent_activity <= 180) else 'Low'
-    size = 'Large' if row['developer_count'] > thresholds['developer_count'] or row['contributor_count'] > thresholds['contributor_count'] else 'Small'
 
-    # Assign categories based on the parameter levels
-    if popularity == 'High' and activity == 'High' and size == 'Large':
-        return 'High Popularity, High Activity, Large Size'
-    elif popularity == 'High' and activity == 'High' and size == 'Small':
-        return 'High Popularity, High Activity, Small Size'
-    elif popularity == 'High' and activity == 'Low' and size == 'Large':
-        return 'High Popularity, Low Activity, Large Size'
-    elif popularity == 'High' and activity == 'Low' and size == 'Small':
-        return 'High Popularity, Low Activity, Small Size'
-    elif popularity == 'Low' and activity == 'High' and size == 'Large':
-        return 'Low Popularity, High Activity, Large Size'
-    elif popularity == 'Low' and activity == 'High' and size == 'Small':
-        return 'Low Popularity, High Activity, Small Size'
+    # Category definitions based on specified criteria
+    if (row['star_count'] > 200 and row['fork_count'] > 100 and 
+        row['developer_count'] > 10 and row['contributor_count'] > 50 and 
+        row['commit_count_6_months'] > 200 and recent_activity is not None and recent_activity <= 180):
+        return 'High Popularity, Actively Maintained'
+    
+    elif (row['star_count'] > 200 and row['fork_count'] > 100 and 
+          4 <= row['developer_count'] <= 10 and 10 <= row['contributor_count'] <= 50 and 
+          row['commit_count_6_months'] < 30 and project_age is not None and project_age > 730 and 
+          recent_activity is not None and recent_activity > 180):
+        return 'High Popularity, Low Maintenance'
+    
+    elif (30 <= row['star_count'] <= 200 and 10 <= row['fork_count'] <= 100 and 
+          row['developer_count'] > 4 and row['contributor_count'] > 10 and 
+          row['commit_count_6_months'] > 200 and recent_activity is not None and recent_activity <= 180):
+        return 'Niche, Actively Maintained'
+    
+    elif (2 <= row['star_count'] <= 30 and 1 <= row['fork_count'] <= 10 and 
+          1 <= row['developer_count'] <= 4 and 2 <= row['contributor_count'] <= 10 and 
+          row['commit_count_6_months'] > 30 and project_age is not None and project_age <= 730 and 
+          recent_activity is not None and recent_activity <= 180):
+        return 'New and Growing'
+    
+    elif (row['star_count'] > 200 and row['fork_count'] > 100 and 
+          row['developer_count'] < 4 and row['contributor_count'] < 10 and 
+          row['commit_count_6_months'] < 30 and project_age is not None and project_age > 730 and 
+          recent_activity is not None and recent_activity > 180):
+        return 'Mature, Low Activity'
+    
+    elif (row['star_count'] < 2 and row['fork_count'] < 1 and 
+          row['developer_count'] < 1 and row['contributor_count'] < 2 and 
+          row['commit_count_6_months'] < 1 and recent_activity is not None and recent_activity > 365):
+        return 'Inactive or Abandoned'
+    
+    elif (row['star_count'] < 30 and row['fork_count'] < 10 and 
+          row['developer_count'] <= 4 and row['contributor_count'] <= 15 and 
+          row['commit_count_6_months'] <= 12):
+        return 'Low Popularity, Low Activity'
+    
+    elif (7 <= row['star_count'] <= 200 and 3 <= row['fork_count'] <= 70 and 
+          2 <= row['developer_count'] <= 9 and 5 <= row['contributor_count'] <= 34 and 
+          row['commit_count_6_months'] <= 23):
+        return 'Moderate Popularity, Low Activity'
+    
+    elif row['commit_count_6_months'] > 50 and recent_activity is not None and recent_activity <= 180:
+        return 'Moderately Maintained'
+    
+    else:
+        return 'Uncategorized'
 
 # Streamlit interface for collection selection
 st.title("Open Source Project Categorization")
@@ -55,37 +76,51 @@ selected_collection = st.selectbox("Select Collection Name", code_metrics['colle
 # Filter the DataFrame based on the selected collection
 filtered_code_metrics = code_metrics[code_metrics['collection_name'] == selected_collection]
 
-# Calculate thresholds based on filtered data
-thresholds = calculate_thresholds(filtered_code_metrics)
+# Apply the classification function directly
+filtered_code_metrics['category'] = filtered_code_metrics.apply(classify_project, axis=1)
 
-# Apply the classification function with dynamic thresholds
-filtered_code_metrics['category'] = filtered_code_metrics.apply(lambda row: classify_project(row, thresholds), axis=1)
+# Create an optional filter for category selection
+selected_category = st.selectbox("Select Category (Optional)", ['All'] + filtered_code_metrics['category'].unique().tolist())
+
+# Further filter the DataFrame based on the selected category
+if selected_category != 'All':
+    filtered_code_metrics = filtered_code_metrics[filtered_code_metrics['category'] == selected_category]
 
 # Display the categorized data
 st.dataframe(filtered_code_metrics)
+
+# Calculate the new Y-axis value
+filtered_code_metrics['commit_per_active_dev'] = (
+    filtered_code_metrics['commit_count_6_months'] / 
+    filtered_code_metrics['active_developer_count_6_months']
+).fillna(0)  # Fill NaN values with 0 if any
 
 # Plot the 2x2 matrix using Plotly
 fig = px.scatter(
     filtered_code_metrics,
     x='star_count',
-    y='commit_count_6_months',
+    y='commit_per_active_dev',  # Use the new column for Y-axis
     color='category',
     title='2x2 Matrix of Open Source Project Categories',
-    labels={'star_count': 'Star Count (Popularity)', 'commit_count_6_months': 'Commit Count (Activity)'},
+    labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
     color_discrete_map={
-        'High Popularity, High Activity, Large Size': 'blue',
-        'High Popularity, High Activity, Small Size': 'orange',
-        'High Popularity, Low Activity, Large Size': 'green',
-        'High Popularity, Low Activity, Small Size': 'purple',
-        'Low Popularity, High Activity, Large Size': 'red',
-        'Low Popularity, High Activity, Small Size': 'gray',
+        'High Popularity, Actively Maintained': 'blue',
+        'High Popularity, Low Maintenance': 'orange',
+        'Niche, Actively Maintained': 'green',
+        'New and Growing': 'purple',
+        'Mature, Low Activity': 'red',
+        'Inactive or Abandoned': 'gray',
+        'Low Popularity, Low Activity': 'brown',
+        'Moderate Popularity, Low Activity': 'pink',
+        'Moderately Maintained': 'cyan',
+        'Uncategorized': 'black'
     }
 )
 
 # Update layout for size and log scale
 fig.update_layout(
-    width=800,  # Increase width
-    height=600,  # Increase height
+    width=1200,  # Increase width
+    height=900,  # Increase height
 )
 
 # Set axes to logarithmic scale
