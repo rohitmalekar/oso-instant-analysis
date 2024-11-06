@@ -125,7 +125,7 @@ fig.update_layout(
 
 # Set axes to logarithmic scale
 fig.update_xaxes(type="log")  # Set x-axis to log scale
-fig.update_yaxes(type="log")  # Set y-axis to log scale
+#fig.update_yaxes(type="log")  # Set y-axis to log scale
 
 # Display the plot in Streamlit
 st.plotly_chart(fig)
