@@ -61,7 +61,12 @@ def classify_project(row):
 st.title("Open Source Observer - Instant Analytics")
 
 # Step 1: Create a filter for the user to select a Collection Name
-selected_collection = st.selectbox("Select Collection Name", code_metrics['collection_name'].unique())
+selected_collection = st.selectbox(
+    "Select Collection Name",
+    options=[""] + code_metrics['collection_name'].unique().tolist(),
+    format_func=lambda x: "Select a Collection" if x == "" else x
+)
+
 
 # Step 2: Filter based on the selected collection and apply classification
 if selected_collection:
