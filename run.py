@@ -148,7 +148,12 @@ if selected_collection:
     # Centering the treemap using Streamlit columns
     col1, col2, col3 = st.columns([1, 3, 1])  # The middle column is wider to center the chart
     with col2:
+        st.info("Categories are derived by analyzing key project attributes, including popularity (star and fork count), maintenance activity \
+        (commit frequency and recent updates), and community engagement (developer and contributor count). By assessing these metrics, projects are \
+        grouped into meaningful categories that reflect their visibility, maintenance status, and growth trajectory.")
         st.plotly_chart(fig_bar)
+
+        st.info("The treemap displays project categories, with block size representing developer count. It offers a quick view of category distribution and highlights projects with the most developer engagement.")
         st.plotly_chart(fig_treemap)
     
     # Step 3: Show the Category selection only after Collection is selected
