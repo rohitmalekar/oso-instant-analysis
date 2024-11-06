@@ -116,13 +116,21 @@ fig = px.scatter(
         'Moderate Popularity, Low Activity': 'pink',
         'Moderately Maintained': 'cyan',
         'Uncategorized': 'black'
-    }
+    },
+    text='display_name'  # Add project display name as text labels
 )
 
 # Update layout for size and log scale
 fig.update_layout(
     width=1200,  # Increase width
     height=900,  # Increase height
+    legend=dict(
+        orientation="h",  # Horizontal legend
+        yanchor="bottom",
+        y=-0.2,  # Position below the graph
+        xanchor="center",
+        x=0.5  # Center the legend
+    )
 )
 
 # Set axes to logarithmic scale
