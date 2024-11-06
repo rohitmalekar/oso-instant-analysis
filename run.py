@@ -117,7 +117,8 @@ fig = px.scatter(
         'Moderately Maintained': 'cyan',
         'Uncategorized': 'black'
     },
-    text='display_name'  # Add project display name as text labels
+    text='display_name',  # Add project display name as text labels
+    textposition='top center'
 )
 
 # Update layout for size and log scale
