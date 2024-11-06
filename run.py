@@ -212,7 +212,7 @@ if selected_collection:
             x='star_count',
             y='commit_per_active_dev',  # Use the new column for Y-axis
             color='category',
-            title='2x2 Matrix of Open Source Project Categories',
+            #title='2x2 Matrix of Open Source Project Categories',
             labels={'star_count': 'Star Count (Popularity)', 'commit_per_active_dev': 'Commits per Active Developer'},
             color_discrete_map={
                 'High Popularity, Actively Maintained': '#4682B4',  # Sky Blue
@@ -233,7 +233,8 @@ if selected_collection:
         fig.update_layout(width=1200, height=900, legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5))
         fig.update_xaxes(type="log")
         fig.update_yaxes(type="log")
-    
+
+        st.info("The scatter plot visualizes projects based on their popularity (star count) and developer activity (commits per active developer). This view helps identify highly active or popular projects within each category, allowing for easy comparison of maintenance and community involvement across projects.")
         # Display the plot
         st.plotly_chart(fig)
 
@@ -267,7 +268,12 @@ if selected_collection:
             'merged_pull_request_count_6_months', 
             'closed_issue_count_6_months'
         ]
-        
+
+        # Reset index to avoid showing the original index in st.dataframe
+        st.dataframe(filtered_code_metrics[column_order].reset_index(drop=True))
+
+
+        st.info("The data table provides a detailed, sortable view of each project, showing key attributes like popularity (stars and forks), activity (commit and pull request counts), and developer engagement (contributor and active developer counts). Use this table to dive deeper into individual project metrics, compare across categories, and gain insights into each project’s maintenance status and community involvement.")
         # Display the DataFrame in the specified column order
         st.dataframe(filtered_code_metrics[column_order])
 
